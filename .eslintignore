@@ -1,0 +1,5 @@
+node_modules/**
+dist/**
+ipfs/**
+
+/webpack.config.js

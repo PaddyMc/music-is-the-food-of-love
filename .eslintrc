@@ -1,0 +1,24 @@
+{
+    "parser": "babel-eslint",
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended"
+    ],
+    "plugins": [
+      "react",
+      "json"
+    ],
+  
+    "globals": {
+      "document": false,
+      "navigator": false,
+      "window": false
+    },
+  
+    "rules": {
+        "semi": ["error", "always"],
+        "quotes": ["error", "double"],
+        "indent": ["error", 2]
+    }
+}
+  
