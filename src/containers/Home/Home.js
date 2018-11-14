@@ -4,25 +4,57 @@ import musicstore from '../../services/contract-utils/musicstore';
 import ipfs from '../../services/ipfs';
 import "./Home.css";
 
+import PropTypes from 'prop-types'
+
 class Home extends Component {
+  static propTypes = {
+    ethereumAddress: PropTypes.string,
+    IPFSHash: PropTypes.string,
+    file: PropTypes.string,
+    ethAddress: PropTypes.string,
+    transactionHash: PropTypes.string,
+    ipfsHash: PropTypes.string,
+    numberOfLatestHash: PropTypes.string,
+    getEthereumAddressUI: PropTypes.func,
+  }
+
   state = {
-    ethereumAddress: "address",
     IPFSHash: "",
     file: "",
     ethAddress: "",
     transactionHash: "",
     ipfsHash: "",
+    numberOfLatestHash: "",
   }
 
-  componentWillMount = () => {
-    this.getAccount();
-    this.getSongLocationFromEthereum(4)
+  componentWillMount = async () => {
+    const {
+      getEthereumAddressUI
+    } = this.props
+
+    console.log(this.props)
+    getEthereumAddressUI()
+
+    console.log(this.props)
+    //this.getAccount();
+    await this.getLatestUpload()
+    this.getSongLocationFromEthereum(this.state.numberOfLatestHash-1)
   }
 
-  getAccount = async () => {
+  getLatestUpload = async () => {
     const accounts = await web3.eth.getAccounts();
-    this.setState({ethereumAddress: accounts[0]})
+    let number = await musicstore.methods.getNumberOfHashes().call({
+      from: accounts[0]
+    })
+
+    console.log(number)
+    this.setState({numberOfLatestHash: number})
   }
+
+  // getAccount = async () => {
+  //   const accounts = await web3.eth.getAccounts();
+  //   this.setState({ethereumAddress: accounts[0]})
+  // }
 
   getSongLocationFromEthereum = async (number) => {
     const accounts = await web3.eth.getAccounts();
@@ -38,21 +70,8 @@ class Home extends Component {
 
   playAudio = async () => {
     const musicFile = await ipfs.get(this.state.IPFSHash)
-    //const hope = await new Buffer(musicFile[0].content, 'binary').toString('binary')
-    console.log(musicFile)
-    let context = new window.AudioContext()
-    var buffer = new ArrayBuffer(musicFile[0].content.length);
-
-    console.log(buffer)
-
-    musicFile[0].content.map(function(value, i){buffer[i] = value});
-    context.decodeAudioData(buffer, (buffer) => {
-      console.log(buffer)
-      // var source = context.createBufferSource()
-      // source.buffer = buffer
-      // source.connect(context.destination);
-      // source.start();
-    })
+    
+    new Audio(`https://ipfs.infura.io/ipfs/${this.state.IPFSHash}`).play()
     console.log("Done")
   }
 
@@ -92,10 +111,14 @@ class Home extends Component {
   }
 
   render(){
+    const {
+      ethereumAddress
+    } = this.props
+
     return(
       <div>
         <h1> Home! </h1>
-        <h1>EthAddress: {this.state.ethereumAddress} </h1>
+        <h1>EthAddress: {ethereumAddress} </h1>
         <h1>IPFSHash: {this.state.IPFSHash} </h1>
 
         <form onSubmit={this.onSubmit}>
@@ -124,6 +147,8 @@ class Home extends Component {
 }
 
 export default Home;
+
+
 
 //  https://remix.ethereum.org/
 //  contract address: 0xcb0dea41c465872101bb902d44d9cb4a7c6e53f3

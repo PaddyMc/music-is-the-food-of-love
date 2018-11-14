@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Home from "../Home/Home";
+import Home from "../Home/Home.container";
 // Uncomment this for hotswapping code
 // import { hot } from "react-hot-loader";
 import "./App.css";
